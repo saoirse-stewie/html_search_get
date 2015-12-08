@@ -15,19 +15,13 @@ public class data extends HttpServlet {
 
 
     Connection connection;
-    PreparedStatement addressBook;
+    PreparedStatement addressBook,find_max,find_min,insert;
 
     public void init(ServletConfig config) {
         try {
             Class.forName("com.mysql.jdbc.Driver");
             connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/address?user=root&password=root");
             //addressBook = connection.prepareStatement("insert into person(firstname,lastname,address,phone) values (?, ? , ? , ? )");
-
-
-
-
-
-
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (SQLException e) {
@@ -40,27 +34,35 @@ public class data extends HttpServlet {
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
 
-    //    try {
-          //  addressBook = connection.prepareStatement(query2);
-           // ResultSet result = addressBook.executeQuery();
 
             out.println("<html><head><title>Query Successful</title></head><body>");
             out.println("<h2>Thank for your entry</h2");
 
-           // out.println("<p> firstname is: " + request.getParameter("firstname") + "</p>");
-          //  out.println("<p> firstname is: " + request.getParameter("lastname") + "</p>");
-          //  out.println("<p> firstname is: " + request.getParameter("address") + "</p>");
-          //  out.println("<p> firstname is: " + request.getParameter("phone") + "</p>");
+           // out.p rintln("<p> firstname is: " + request.getParameter("firstname") + "</p>");
+        //  out.println("<p> firstname is: " + request.getParameter("lastname") + "</p>");
+        //  out.println("<p> firstname is: " + request.getParameter("address") + "</p>");
+        //  out.println("<p> firstname is: " + request.getParameter("phone") + "</p>");
 
         String query2 = "Select * from person where firstname = " + "'" + request.getParameter("firstname") +  "'";
-        
+        String query = "SELECT MAX(phone) AS phone FROM person";
+        String query3 = "SELECT MIN(phone) AS phone FROM person";
+        String query4= "insert into person (id, phone) value (9, " + request.getParameter("phone")+ ")";
+
 
         out.println("<p> your query is: " + query2 + "</p>");
+        out.println("<p> your query is: " + query + "</p>");
+        out.println("<p> your query is: " + query3 + "</p>");
+        out.println("<p> your query is: " + query4 + "</p>");
 
         try {
             addressBook = connection.prepareStatement(query2);
+            find_max = connection.prepareStatement(query);
+            find_min = connection.prepareStatement(query3);
+            insert = connection.prepareStatement(query4);
             ResultSet result = addressBook.executeQuery();
-
+            ResultSet result2 = find_max.executeQuery();
+            ResultSet result3 = find_min.executeQuery();
+            int result4 = insert.executeUpdate();
 
 
 
@@ -71,9 +73,18 @@ public class data extends HttpServlet {
                 result.getString("lastname")+ "," + result.getString("address") + ","
                         + result.getDouble("phone") + "</p>");
                 ++count;
-//
             }
             out.println("<p>======" + count + "records found ====</p>");
+            while(result2.next())
+            {
+                out.println("<p>" + result2.getDouble("phone") +"</p");
+            }
+            while(result3.next())
+            {
+                out.println("<p>" + result3.getDouble("phone") +"</p");
+            }
+
+
 
 
         } catch (SQLException e) {
